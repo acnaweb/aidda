@@ -1,0 +1,13 @@
+## Install
+
+
+https://diagrams.mingrammer.com/docs/getting-started/installation
+sudo apt install graphviz
+pip install diagrams
+
+## References
+
+- https://cloud.google.com/icons?hl=pt_br
+- https://googlecloudcheatsheet.withgoogle.com/
+- https://www.flaticon.com/
+
