@@ -1,9 +1,18 @@
+# Aidda
+
 ## Install
 
+- https://diagrams.mingrammer.com/docs/getting-started/installation
 
-https://diagrams.mingrammer.com/docs/getting-started/installation
+```sh
 sudo apt install graphviz
-pip install diagrams
+```
+
+## Run
+
+```sh
+jupyter lab
+```
 
 ## References
 
