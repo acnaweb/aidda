@@ -6,6 +6,7 @@
 
 ```sh
 sudo apt install graphviz
+make install
 ```
 
 ## Run
