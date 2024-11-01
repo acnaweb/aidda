@@ -1,0 +1,58 @@
+@startuml skill-management-1.0
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Skill Management 1.0
+
+LAYOUT_LEFT_RIGHT()
+
+Person(UserSalesForce, "Usuário")
+Person(UserCalculadoraComercial, "Usuário")
+Person(UserRegras, "Usuário")
+
+System_Boundary(external_systems, "External Systems") {
+    Container(SalesForce, "SalesForce", "SalesForce", "Aplicação Sales Force")
+    Container(CalculadoraComercial, "Calculadora Comercial", "Excel")    
+    Container(CalculadoraFE, "UI Regras de Cálculo", "Angular", "Regras de cálculo")
+}
+
+System_Boundary(system_middleware, "Middleware") {
+    ContainerDb(MongoDB, "Database", "MongoDB", "Repositório de dados prontos para SalesForce")
+
+    System_Boundary(real_time, "Realtime") {
+        Container(API, "API Malha Fiscal", "Node/Go", "Consultar impostos a partir de parâmetros")       
+        Container(APIPersistencia, "API Persistencia", "Node/Go", "Persistencia no Mongo")       
+    }
+
+    System_Boundary(batch, "Batch") {
+        Container(Job, "Job", "Alteryx", "ETL")
+    }
+
+    System_Boundary(calculators, "Calculadoras") {
+        Container(APICalculadora, "API Calculadora Tributaria", "Python", "Regras de cálculo")
+    }    
+}
+
+System_Boundary(system_erp, "ERP") {
+    Container(API_Protheus, "API Protheus", "Advpl", "Consultar impostos a partir de parâmetros")        
+    Container(Protheus, "ERP", "Protheus", "")
+    ContainerDb(BD_Protheus_Clone, "DB Protheus (Clone)", "BD")                
+}
+
+Rel(UserSalesForce, SalesForce, "Interação no SalesForce")
+Rel(UserCalculadoraComercial, CalculadoraComercial, "Interação no Excel")
+Rel(UserRegras, CalculadoraFE, "Manutenção de regras fiscais")
+
+BiRel(SalesForce, API, "Consultar dados tributários")
+Rel(API, MongoDB, "Consultar dados tributários")
+Rel(API, API_Protheus, "Consultar dados tributários")
+BiRel(API_Protheus, Protheus, "Processar e retornar dados de simulação de NF")
+BiRel(API, APICalculadora, "POST Calcular impostos")
+Rel(APICalculadora, APIPersistencia, "Salvar dados calculados")
+BiRel(Job, BD_Protheus_Clone, "Pesquisar delta + timestamp de atualização")
+Rel(Job, APICalculadora, "Enviar dados para calculo tributário")
+Rel(APIPersistencia, MongoDB, "Salvar dados e replicar no Mongo")
+Rel(Job, MongoDB, "Extrair dados para calculadora comercial")
+Rel(Job, CalculadoraComercial, "Disponibilizar dados para calculadora comercial")
+BiRel(APICalculadora, MongoDB, "Consultar/Persistir regras tributárias")
+Rel(CalculadoraFE, APICalculadora, "Manutenção de Regras Fiscais")
+
+@enduml

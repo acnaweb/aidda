@@ -1,0 +1,66 @@
+@startuml Elfa
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Elfa - Processo de cálculo de margem de venda - v1.1
+
+LAYOUT_TOP_DOWN()
+
+Person(User, "Usuário")
+
+System_Boundary(system_erp, "") {
+    System_Boundary(erp, "") {
+        Container(Protheus, "ERP", "Protheus", "")
+        Container(Job, "Job", "Job", "Atualização diária de cache")
+        Container(Gatilho, "Gatilho", "Trigger", "Invalidar o cache")        
+    }
+
+    System_Boundary(databases, "Databases") {
+
+        System_Boundary(erp_prd, "Prd") {
+            ContainerDb(Cache_Protheus, "Cache Protheus", "Cache Prd")
+            ContainerDb(BD_Protheus, "DB Protheus", "BD Prd")
+            Rel(Job, Cache_Protheus, "Atualizar o cache")
+            Rel(Job, BD_Protheus, "Consultar os itens fiscais dos últimos N dias")
+            Rel(Protheus, Cache_Protheus, "Consultar os itens fiscais sob demanda")            
+        }
+
+        System_Boundary(erp_clone, "Clone") {
+            ContainerDb(Cache_Protheus_Clone, "Cache Protheus", "Cache Clone")
+            ContainerDb(BD_Protheus_Clone, "DB Protheus", "BD Clone")
+            Rel(Job, Cache_Protheus_Clone, "Atualizar o cache")
+            Rel(Job, BD_Protheus_Clone, "Consultar os itens fiscais dos últimos N dias")        
+        }
+    }
+
+   
+}
+
+System_Boundary(system_middleware, "Middleware") {
+    System_Boundary(batch, "Batch") {
+        Container(Data_Ingestion, "Ingestão de Dados", "Alteryx", "ML/AI & Exceto Venda")
+    }
+
+    System_Boundary(real_time, "Realtime") {
+        Container(API_Protheus, "API Protheus", "Protheus", "Consultar impostos a partir de parâmetros")
+        Container(Calculadora, "Calculadora", "", "Regras de cálculo")
+        ContainerDb(MongoDB, "Database", "MongoDB", "Repositório de dados prontos para SalesForce")
+    }
+}
+
+System_Boundary(system_sales, "System Sales Force") {
+    Container(SalesForce, "SalesForce", "SalesForce", "Aplicação Sales Force")
+}
+
+Rel_U(system_middleware, system_erp, "")
+Rel(User, SalesForce, "Interação no SalesForce")
+Rel(SalesForce, MongoDB, "Consultar dados tributários")
+BiRel(SalesForce, API_Protheus, "Consultar dados tributários")
+Rel(API_Protheus, Calculadora, "Forçar o cálculo de impostos")
+Rel(Calculadora, MongoDB, "Salvar dados calculados")
+Rel(API_Protheus, Protheus, "Processar e retornar dados de simulação de NF")
+Rel(API_Protheus, Cache_Protheus_Clone, "Armazenar e consultar dados de simulação de NF")
+Rel(Protheus, Gatilho, "Disparar a partir de TES, Produto ou cadastros fiscais")
+Rel(Gatilho, Cache_Protheus, "Invalidar cache")
+Rel(Data_Ingestion, Cache_Protheus_Clone, "ML/AI & Operações (exceto SalesForce)")
+Rel(Data_Ingestion, MongoDB, "Salvar dados")
+
+@enduml

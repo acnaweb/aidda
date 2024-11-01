@@ -1,0 +1,54 @@
+@startuml elfa-v1.3
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Elfa - Processo de cálculo de margem de venda - v1.3
+
+LAYOUT_LANDSCAPE()
+
+Person(User, "Usuário")
+
+System_Boundary(system_erp, "ERP") {
+    Container(API_Protheus, "API Protheus", "Advpl", "Consultar impostos a partir de parâmetros")        
+    Container(Protheus, "ERP", "Protheus", "")
+    ContainerDb(BD_Protheus, "DB Protheus", "BD")                
+    ContainerDb(BD_Protheus_Clone, "DB Protheus (Clone)", "BD")                
+}
+
+System_Boundary(system_middleware, "Middleware") {
+    ContainerDb(MongoDB, "Database", "MongoDB", "Repositório de dados prontos para SalesForce")
+
+    System_Boundary(batch, "Batch") {
+        Container(Job, "Job", "Alteryx", "ETL")
+    }
+
+    System_Boundary(calculators, "Calculadoras") {
+        Container(Calculadora, "Calculadora Tributaria", "API", "Regras de cálculo")
+    }    
+
+    System_Boundary(real_time, "Realtime") {
+        Container(API, "API Middleware", "Node/Go", "Consultar impostos a partir de parâmetros")       
+    }
+}
+
+System_Boundary(external_systemas, "External Systems") {
+    Container(SalesForce, "SalesForce", "SalesForce", "Aplicação Sales Force")
+    Container(CalculadoraComercial, "Calculadora Comercial", "Excel")    
+}
+
+
+
+Rel(User, SalesForce, "Interação no SalesForce")
+Rel(User, CalculadoraComercial, "Interação no Excel")
+BiRel(SalesForce, API, "Consultar dados tributários")
+Rel(API, MongoDB, "Consultar dados tributários")
+Rel(API, API_Protheus, "Consultar dados tributários")
+BiRel(API_Protheus, Protheus, "Processar e retornar dados de simulação de NF")
+BiRel(Protheus, BD_Protheus, "Consultar e processar dados")
+BiRel(API, Calculadora, "Calcular impostos")
+Rel(Calculadora, MongoDB, "Salvar dados calculados")
+BiRel(Job, BD_Protheus_Clone, "Pesquisar delta + timestamp de atualização")
+Rel(Job, API, "Enviar dados para calculo tributário")
+
+Rel(Job, MongoDB, "Extrair dados para calculadora comercial")
+Rel(Job, CalculadoraComercial, "Disponibilizar dados para calculadora comercial")
+
+@enduml

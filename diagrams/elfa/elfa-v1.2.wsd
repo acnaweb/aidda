@@ -1,0 +1,49 @@
+@startuml Elfa
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Elfa - Processo de cálculo de margem de venda - v1.2
+
+LAYOUT_LANDSCAPE()
+
+Person(User, "Usuário")
+
+System_Boundary(system_erp, "ERP") {
+    Container(Protheus, "ERP", "Protheus", "")
+    ContainerDb(BD_Protheus, "DB Protheus (Clone)", "BD Clone")                
+}
+
+System_Boundary(system_middleware, "Middleware") {
+    ContainerDb(MongoDB, "Database", "MongoDB", "Repositório de dados prontos para SalesForce")
+
+    System_Boundary(batch, "Batch") {
+        Container(Job, "Job", "Alteryx", "ETL")
+    }
+
+    System_Boundary(calculators, "Calculadoras") {
+        Container(Calculadora, "Calculadora Tributaria", "", "Regras de cálculo")
+    }    
+
+    System_Boundary(real_time, "Realtime") {
+        Container(API_Protheus, "API Protheus", "Protheus", "Consultar impostos a partir de parâmetros")       
+    }
+}
+
+System_Boundary(external_systemas, "External Systems") {
+    Container(SalesForce, "SalesForce", "SalesForce", "Aplicação Sales Force")
+    Container(CalculadoraComercial, "Calculadora Comercial", "Excel")    
+}
+
+
+
+Rel(User, SalesForce, "Interação no SalesForce")
+Rel(User, CalculadoraComercial, "Interação no Excel")
+Rel(SalesForce, MongoDB, "Consultar dados tributários")
+BiRel(SalesForce, API_Protheus, "Consultar dados tributários")
+BiRel(API_Protheus, Protheus, "Processar e retornar dados de simulação de NF")
+Rel(API_Protheus, Calculadora, "Forçar o cálculo de impostos")
+Rel(Calculadora, MongoDB, "Salvar dados calculados")
+BiRel(Job, BD_Protheus, "ML/AI - Pesquisar delta + timestamp de atualização")
+Rel(Job, API_Protheus, "Enviar dados para calculo tributário")
+BiRel(Protheus, BD_Protheus, "Consultar e processar dados")
+Rel(Job, MongoDB, "Extrair dados para calculadora comercial")
+Rel(Job, CalculadoraComercial, "Disponibilizar dados para calculadora comercial")
+@enduml
