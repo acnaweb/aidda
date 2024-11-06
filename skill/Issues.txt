@@ -1,0 +1,10 @@
+- Temos várias planilhas 
+- Superbusca com Elastic Search
+
+
+Processo,arquivo,objetivo
+
+Features
+- controlar mapeado, porém não recebido
+
+
