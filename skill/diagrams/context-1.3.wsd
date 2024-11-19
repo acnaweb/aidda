@@ -1,0 +1,39 @@
+@startuml brain-navigator
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title BrAIn Navigator
+
+Person(final_user, "Usuários", "Gestores/Consultores/Operação")
+
+System_Boundary(system, "") {
+
+    System_Boundary(software, "Software") {
+        ContainerDb(database, "database", "MySQL", "Repositório de dados")
+        Container(api, "API", "Python", "Backend")
+        Container(ui, "UI", "Angular", "Frontend")   
+    }   
+
+    System_Boundary(analytics, "Analytics & Processing") {
+        Container(gen_ai, "Gen AI", "", "Pesquisa por contexto")
+        Container(transformation, "Data Transformation", "Cloud Run", "")
+        Container(notifify, "Notifify", "", "")
+    }     
+}
+
+Rel(final_user, ui, "Upload das planilhas")
+Rel(final_user, ui, "Operar o sistema")
+
+Rel(api, transformation, "Importar dados das planilhas")
+BiRel(transformation, database, "Carregar e salvar planilhas")
+
+BiRel(api, database, "Carregar, transformar e salvar nome")
+BiRel(ui, api, "User Interface")
+
+Rel(database, notifify , "Ler informações" )
+
+BiRel(api, notifify, "Disparar notificações")
+Rel(notifify, final_user, "Notificar consultores sem projetos")
+
+BiRel(ui, gen_ai, "Pesquisa por texto")
+Rel(gen_ai, database, "Pesquisa por texto")
+
+@enduml

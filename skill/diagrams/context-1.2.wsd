@@ -1,0 +1,61 @@
+@startuml skill-management-1.2
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+title Skill Management - 1.2 
+Person(user, "Adm")
+Person(final_user, "Usuários finais")
+
+System_Boundary(external_systems, "External Systems") {
+    ContainerDb(excel_base, "Planilhas (Base)", "Excel", "Repositório de dados")
+    ContainerDb(consultor_teams, "Consultores", "Teams", "Repositório de dados")
+    ContainerDb(consultor_rh, "Consultores", "RH", "Repositório de dados")
+
+}
+
+System_Boundary(datalake, "Data Lake") {
+    ContainerDb(excel, "Repositório de Processos", "Excel", "Repositório de dados")
+}
+
+System_Boundary(system, "System") {
+
+    System_Boundary(data_ops, "Data Pipeline") {
+        Container(orchestration, "Orchestration", "python", "")
+        Container(el, "Data Ingestion", "python", "")
+        Container(transformation, "Data Transformation", "dbt", "")
+    }
+
+    System_Boundary(software, "Software") {
+        ContainerDb(database, "database", "MySQL", "Repositório de dados")
+        Container(api, "API", "Python", "Backend")
+        Container(ui, "UI", "Angular", "Frontend")   
+        Container(notifify, "Notifify", "", "")
+    }   
+
+    System_Boundary(analytics, "Analytics") {
+        ContainerDb(db_search, "Elastic Search", "Elastic Search", "Pesquisa por contexto")        
+        Container(gen_ai, "Gen AI", "", "Pesquisa por contexto")
+    }     
+}
+
+Rel(orchestration, el, "Schedule job")
+Rel(orchestration, transformation, "Schedule job")
+
+Rel(user, excel_base, "Exportar para versão de integração")
+Rel(user, excel, "Criar e copiar para data lake")
+Rel(final_user, ui, "Operar o sistema")
+
+Rel(excel, el, "Carregar dados")
+Rel(el, database, "Salvar dados")
+BiRel(transformation, database, "Carregar, transformar e salvar nome")
+
+Rel(api, database, "Carregar, transformar e salvar nome")
+Rel(ui, api, "User Interface")
+
+Rel(database, notifify , "Ler informações" )
+Rel(notifify, final_user, "Notificar conforme os eventos")
+
+Rel(el, db_search, "Atualizar repositório de pesquisa por texto")
+Rel(ui, db_search, "Pesquisa por texto")
+Rel(ui, gen_ai, "Pesquisa por texto")
+Rel(gen_ai, database, "Pesquisa por texto")
+
+@enduml

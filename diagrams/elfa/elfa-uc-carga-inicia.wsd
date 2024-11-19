@@ -1,0 +1,43 @@
+@startuml elfa-job-carga-inicial
+title Job Carga Inicial (única execução)
+
+control     Alteryx as job
+database    DB_Protheus as db
+entity      CSV as csv
+control     API_Impostos as api_imposto
+control     Protheus as protheus
+control     API_Calculadora as api_calculadora
+entity      CSV_Temp as csv_temp
+control     API_Persistencia as api_persistencia
+collections Mongodb as mongo
+
+group Consulta tabelas base
+job -> db: Consultar tabelas (D0)
+db -> job: Retornar tabelas base 
+end 
+
+
+group Processamento
+job -> job: Gerar base de carga inicial
+job -> csv: Exportar dados (85k linhas)
+end
+
+api_imposto <- csv: Carregar o csv
+api_imposto -> protheus: Enviar dados 
+protheus -> api_imposto: Retornar os calculos de impostos
+api_imposto -> api_calculadora: Efetuar cálculos para exceções
+api_calculadora -> csv_temp: Salvar em arquivos para posterior persistencia\n ** Podemos usar o mesmo processo atual? **
+
+alt Processo atual
+csv_temp -> mongo: Persistir dados
+
+else Aguardar
+
+  group Camada de Persistencia
+  api_calculadora <- csv_temp: Ler o csv 
+  api_calculadora -> api_persistencia: Enviar dados completos para persistencia
+  api_persistencia -> mongo: Persistentir dados
+  end
+
+end
+@enduml

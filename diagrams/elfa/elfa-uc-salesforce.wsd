@@ -1,0 +1,26 @@
+@startuml elfa-salesforce-sob-demanda
+title Sales Force (sob demanda)
+
+actor Usuario as user
+control     SalesForce as sf
+control     API_Malha as api_malha
+collections Mongodb as mongo
+control     API_Impostos as api_imposto
+control     Protheus as protheus
+control     API_Calculadora as api_calculadora
+
+user -> sf: Efetuar cotação
+sf -> api_malha: Enviar dados de consulta
+
+alt Dados já existem no Mongo
+ api_malha <-> mongo: Consultar dados
+else Dados não existem no Mongo
+ api_malha -> api_imposto: Enviar dados para consulta no Protheus
+ api_imposto -> protheus: Enviar dados 
+ protheus -> api_imposto: Retornar os calculos de impostos
+ api_malha <- api_imposto: Retornar os calculos de impostos
+ api_malha <-> api_calculadora: Efetuar cálculos para exceções
+end
+sf <- api_malha: Retornar dados para Sales Force
+user <- sf: Verifica os dados retornados
+@enduml

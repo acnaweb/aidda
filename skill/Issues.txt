@@ -6,5 +6,7 @@ Processo,arquivo,objetivo
 
 Features
 - controlar mapeado, porém não recebido
+- Importar historico de alocações
+- Criar regras de alocação para validação
 
 
