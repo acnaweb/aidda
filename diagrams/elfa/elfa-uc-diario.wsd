@@ -6,7 +6,6 @@ database    DB_Protheus as db
 collections Mongodb as mongo
 control     API_Impostos as api_imposto
 control     Protheus as protheus
-control     API_Malha as api_malha
 control     API_Calculadora as api_calculadora
 control     API_Persistencia as api_persistencia
 
@@ -25,8 +24,7 @@ job ->  api_imposto: Enviar Delta
 api_imposto -> protheus: Enviar dados Delta
 protheus -> api_imposto: Retornar os calculos de impostos
 api_imposto -> job: Retornar os calculos de impostos
-job -> api_malha: Enviar base final a ser \najustada pela calculadora
-api_malha -> api_calculadora: Efetuar cálculos para exceções
+job -> api_calculadora: Enviar base final a ser \najustada pela calculadora
 
 group Camada de Persistencia
 api_calculadora -> api_persistencia: Enviar dados completos para persistencia
