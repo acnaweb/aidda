@@ -1,3 +1,5 @@
+
+```mermaid
 erDiagram
     
     PROJETO {
@@ -174,3 +176,4 @@ erDiagram
     PESSOA_AUTOAVALIACAO_SETOR }|--|| SETOR: possui
     PESSOA_AUTOAVALIACAO_PRODUTO }|--|| PESSOA: possui
     PESSOA_AUTOAVALIACAO_PRODUTO }|--|| PRODUTO: possui
+```
