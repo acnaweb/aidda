@@ -1,0 +1,6 @@
+#	Arquivos a serem salvos
+1	SB1 - Base Produtos
+2	SA1 - Base Clientes
+3	CFC - UFxUF
+4	Base Filiais
+5	Base suporte ICMS Entrada
