@@ -4,14 +4,17 @@
 
 ### Entidade Read Only (somente importação)
 
+- PRODUTO (Taxonomia CT.xls)
+- SETOR (Taxonomia CT.xls)
+- CONTROLE_ALAVANCA (Checklist_Controle Alavancas)
+- CHECKLIST_ALAVANCA (Checklist Alavancas)
+- ESPECIALIZACAO
 - PROJETO 
 - CLIENTE
 - CRM
-- SETOR 
 - PROPOSTA 
 - BRAIN 
-- ALAVANCA 
-- PRODUTO 
+- IMPACTO
 - PESSOA 
 - CARGO 
 - CONTATO 
