@@ -1,48 +1,104 @@
-
-```mermaid
 erDiagram
+
+    CAPTURA_PROJETO {
+    }
+
+    SETOR {
+        int codigo
+        string nivel_1 "Taxonomia CT.xls[Setores]N1"
+        string nivel_2 "Taxonomia CT.xls[Setores]N2"
+        string nivel_3 "Taxonomia CT.xls[Setores]N3"
+        string nivel_4 "Taxonomia CT.xls[Setores]N4"
+    }
+
+    PRODUTO {
+        int codigo
+        string especializacao "Taxonomia CT.xls[Produtos]N1"
+        string pilar "Taxonomia CT.xls[Produtos]N2"
+        string produto "Taxonomia CT.xls[Produtos]N3"
+    }
     
     PROJETO {
-        string codigo
+        int codigo
         string nome_projeto
         int codigo_cliente
         int codigo_produto
+        int codigo_checklist_alavanca
         boolean is_case "Define se o projeto é case"
+    }
 
+    DOCUMENTO {
+        int codigo
+        string nome
+        string url "Sharepoint"
+        enum tipo "CASE|PROPOSTA|POV|TESE|DOCUMENTO_PROJETO"
     }
     
-    BRAIN {
+    ESPECIALIZACAO {
         int codigo
-        int codigo_projeto "Case de projeto encerrado"
-        int codigo_alavanca
-        string impacto "Descrição do impacto do resultado no cliente"
-        string resultado "<<Confirmar>> Resultado do projeto "
+        string nome "Especializacao na A&M"
+    }
+    FRENTE {
+        int codigo
+        string nome "Frente na A&M"
+    }
+
+    IMPACTO {
+        int codigo
+        string nome
     }
 
     ALAVANCA {
         int codigo
-        string descricao
+        string nome 
     }
+
+    CARGO {
+        int codigo
+        string nome
+    }
+
+    IDIOMA {
+        int codigo
+        string nome
+    }
+
+    CONTROLE_ALAVANCA {
+        int codigo
+        int codigo_alavanca
+        int codigo_especializacao
+        int codigo_frente        
+    }
+
+    CHECKLIST_ALAVANCA {
+        int int
+        int codigo_projeto
+        int codigo_impacto 
+        int codigo_alavanca
+        int codigo_frente
+        int codigo_impacto
+        enum implementado
+        enum recorrente
+        enum base
+        string iniciativa "Descrição"       
+    }
+
+    CHECKLIST_ALAVANCA }o--|| IMPACTO: possui
+    CHECKLIST_ALAVANCA }o--|| FRENTE: possui
+    CHECKLIST_ALAVANCA }o--|| ALAVANCA: possui
+    CONTROLE_ALAVANCA }o--|| ESPECIALIZACAO: possui
+    CONTROLE_ALAVANCA }o--|| FRENTE: possui
+    CONTROLE_ALAVANCA }o--|| ALAVANCA: possui
 
     PROPOSTA {
         int codigo
     }
     
     CLIENTE {
-        int codigo
-        int codigo_setor 
+        int codigo PK
+        int codigo_setor FK
         string pov "<<Dúvida>> Onde mapear?"
         string tese "<<Dúvida>> Onde mapear?"
-    }
-
-    SETOR {
-        int codigo
-        string nome_setor
-    }
-
-    PRODUTO {
-        int codigo
-        string nome_produto
     }
 
     PESSOA {
@@ -106,16 +162,6 @@ erDiagram
         date data_fim
     }
 
-    CARGO {
-        int codigo
-        string nome_cargo
-    }
-
-    IDIOMA {
-        int codigo
-        string idioma
-    }
-
     PESSOA_IDIOMA {
         int codigo_pessoa
         int codigo_idioma
@@ -124,7 +170,7 @@ erDiagram
 
     CERTIFICACAO {
         int codigo
-        string certificacao
+        string nome
     }
 
     PESSOA_CERTIFICACAO {
@@ -152,10 +198,18 @@ erDiagram
         int codigo_produto "Offering Name"
     }
 
+    PROJETO }o--|{ PRODUTO: possui
     CLIENTE ||--o{ PROJETO : possui 
-    SETOR ||--o{ CLIENTE : pertence 
-    PROJETO ||--|| PRODUTO: possui
+    PROJETO ||--o{ DOCUMENTO: possui
+    SETOR ||--o{ DOCUMENTO: possui
+    CLIENTE ||--o{ DOCUMENTO: possui
+    PRODUTO }|--o{ DOCUMENTO: possui
     BRAIN |o--o{ PROJETO: possui 
+
+
+
+    SETOR ||--o{ CLIENTE : pertence 
+    
     BRAIN |o--o{ ALAVANCA: possui 
     PROPOSTA }|--o| PROJETO: possui
     ALOCACAO }o--|| PESSOA: possui
@@ -176,4 +230,3 @@ erDiagram
     PESSOA_AUTOAVALIACAO_SETOR }|--|| SETOR: possui
     PESSOA_AUTOAVALIACAO_PRODUTO }|--|| PESSOA: possui
     PESSOA_AUTOAVALIACAO_PRODUTO }|--|| PRODUTO: possui
-```
