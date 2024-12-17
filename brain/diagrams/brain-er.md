@@ -205,11 +205,7 @@ erDiagram
     CLIENTE ||--o{ DOCUMENTO: possui
     PRODUTO }|--o{ DOCUMENTO: possui
     BRAIN |o--o{ PROJETO: possui 
-
-
-
     SETOR ||--o{ CLIENTE : pertence 
-    
     BRAIN |o--o{ ALAVANCA: possui 
     PROPOSTA }|--o| PROJETO: possui
     ALOCACAO }o--|| PESSOA: possui
